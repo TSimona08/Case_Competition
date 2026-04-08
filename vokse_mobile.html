@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Vokse</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#0D1F3C; --ink2:#3D4A5C; --ink3:#8A96A4;
+  --bg:#F6F4EF; --card:#FFFFFF;
+  --teal:#0F8C6D; --teal2:#1AAD89; --teal-pale:#E0F4EF;
+  --blue:#1E5FA8; --blue-pale:#EEF4FB;
+  --amber:#E8931A; --amber-pale:#FDF3DC;
+  --coral:#E05A3A; --coral-pale:#FAEAE4;
+  --purple:#5B4FCF; --purple-pale:#EEECFB;
+  --green:#2E8B57; --green-pale:#E5F4EC;
+  --red:#C0392B; --red-pale:#FDECEA;
+  --border:rgba(13,31,60,0.09);
+  --r:16px; --r-sm:10px;
+  --nav-h:62px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{
+  width:100%;max-width:430px;margin:0 auto;
+  background:var(--bg);
+  font-family:'Outfit',sans-serif;
+  color:var(--ink);font-size:15px;line-height:1.55;
+  overflow-x:hidden;
+}
+
+/* ── SHELL ── */
+.app-shell{
+  display:flex;flex-direction:column;
+  height:100dvh;height:100vh;
+  overflow:hidden;
+  position:relative;
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  padding:0 16px;
+  height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+  position:relative;z-index:10;
+}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-style:italic;color:var(--ink);letter-spacing:-0.5px;}
+.logo em{color:var(--teal);font-style:normal;}
+.logo-sub{font-size:10px;color:var(--ink3);letter-spacing:0.2px;margin-top:-1px;}
+.topbar-right{display:flex;gap:8px;align-items:center;}
+.icon-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--bg);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;flex-shrink:0;
+}
+.notif-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--coral);
+  position:absolute;top:5px;right:5px;border:2px solid var(--card);
+}
+.av{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--teal-pale);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--teal);flex-shrink:0;
+}
+
+/* ── PAGE AREA ── */
+.page-area{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  position:relative;
+}
+
+/* ── BOTTOM NAV ── */
+.bnav{
+  height:var(--nav-h);flex-shrink:0;
+  background:var(--card);border-top:1px solid var(--border);
+  display:flex;
+  position:relative;z-index:10;
+}
+.ntab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;border:none;background:transparent;
+  padding:6px 2px 4px;
+  -webkit-tap-highlight-color:transparent;
+  transition:color 0.12s;
+}
+.ntab svg{width:22px;height:22px;}
+.ntab span{font-size:10px;font-weight:500;color:var(--ink3);}
+.ntab .nind{width:4px;height:4px;border-radius:50%;background:var(--teal);opacity:0;margin-bottom:1px;}
+.ntab.active span,.ntab.active svg{color:var(--teal);}
+.ntab.active .nind{opacity:1;}
+
+/* ── PANELS ── */
+.panel{display:none;}
+.panel.active{display:block;animation:fadeIn 0.18s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Chat panel is special — needs flex column full height */
+#panel-chat{display:none;flex-direction:column;height:100%;}
+#panel-chat.active{display:flex;}
+
+/* ── REUSABLE ── */
+.sec{padding:20px 16px 0;}
+.sec-title{font-size:12px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:0.9px;margin-bottom:10px;}
+.card{background:var(--card);border-radius:var(--r);border:1px solid var(--border);}
+.card-p{padding:16px;}
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;}
+.pill-teal{background:var(--teal-pale);color:var(--teal);}
+.pill-amber{background:var(--amber-pale);color:var(--amber);}
+.pill-coral{background:var(--coral-pale);color:var(--coral);}
+.pill-blue{background:var(--blue-pale);color:var(--blue);}
+.pill-green{background:var(--green-pale);color:var(--green);}
+.pill-red{background:var(--red-pale);color:var(--red);}
+.pill-purple{background:var(--purple-pale);color:var(--purple);}
+.pbar{height:5px;background:var(--bg);border-radius:100px;overflow:hidden;}
+.pbar-fill{height:5px;border-radius:100px;background:var(--teal2);transition:width 0.35s;}
+.div{height:1px;background:var(--border);}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:14px 20px;border-radius:var(--r-sm);
+  font-size:15px;font-weight:600;cursor:pointer;border:none;
+  font-family:'Outfit',sans-serif;transition:opacity 0.12s;width:100%;
+}
+.btn:active{opacity:0.82;}
+.btn-primary{background:var(--teal);color:#fff;}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--ink2);}
+.back-row{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 16px;cursor:pointer;
+  font-size:14px;color:var(--ink3);
+  border-bottom:1px solid var(--border);
+  background:var(--card);
+}
+.back-row:active{background:var(--bg);}
+
+/* ═══════════════════════════
+   DASHBOARD
+═══════════════════════════ */
+.hero{
+  background:var(--teal);margin:16px;border-radius:var(--r);
+  padding:20px;position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;right:-15px;top:-15px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.06);}
+.hero::after{content:'';position:absolute;right:15px;bottom:-25px;width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,0.04);}
+.hero-g{font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:3px;}
+.hero-n{font-family:'Playfair Display',serif;font-size:20px;color:#fff;margin-bottom:14px;}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:relative;z-index:1;}
+.hstat{background:rgba(255,255,255,0.13);border-radius:10px;padding:10px 12px;}
+.hstat-v{font-size:19px;font-weight:700;color:#fff;}
+.hstat-l{font-size:11px;color:rgba(255,255,255,0.72);margin-top:1px;}
+
+.mod-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 16px;
+  background:var(--card);cursor:pointer;
+  border-bottom:1px solid var(--border);
+}
+.mod-row:active{background:var(--bg);}
+.mod-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mod-info{flex:1;min-width:0;}
+.mod-name{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:4px;}
+.mod-meta{font-size:12px;color:var(--ink3);}
+.mod-pct{font-size:13px;font-weight:700;}
+
+.act-item{display:flex;gap:10px;align-items:flex-start;padding:12px 16px;border-bottom:1px solid var(--border);}
+.act-item:last-child{border-bottom:none;}
+.act-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.act-text{font-size:13px;color:var(--ink2);flex:1;line-height:1.4;}
+.act-time{font-size:11px;color:var(--ink3);margin-top:2px;}
+
+/* ═══════════════════════════
+   LEARN
+═══════════════════════════ */
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;}
+.mod-card{
+  background:var(--card);border-radius:var(--r);
+  border:1px solid var(--border);overflow:hidden;
+  cursor:pointer;transition:opacity 0.12s;
+}
+.mod-card:active{opacity:0.8;}
+.mc-top{height:5px;}
+.mc-body{padding:13px 12px;}
+.mc-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:9px;}
+.mc-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px;line-height:1.3;}
+.mc-meta{font-size:11px;color:var(--ink3);margin-bottom:8px;}
+
+.topic-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 16px;
+  border-bottom:1px solid var(--border);
+  background:var(--card);cursor:pointer;
+}
+.topic-row:active{background:var(--bg);}
+.tnum{
+  width:27px;height:27px;border-radius:50%;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--ink3);flex-shrink:0;
+}
+.tnum.done{background:var(--teal-pale);color:var(--teal);}
+
+.assess-q{
+  font-family:'Playfair Display',serif;
+  font-size:19px;line-height:1.4;color:var(--ink);margin-bottom:18px;
+}
+.opt-list{display:flex;flex-direction:column;gap:9px;}
+.opt-btn{
+  width:100%;padding:13px 15px;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  background:var(--card);font-size:14px;text-align:left;cursor:pointer;
+  font-family:'Outfit',sans-serif;color:var(--ink);transition:border-color 0.12s;
+}
+.opt-btn:active{background:var(--bg);}
+.opt-btn.correct{border-color:var(--teal2);background:var(--teal-pale);color:var(--teal);}
+.opt-btn.wrong{border-color:var(--red);background:var(--red-pale);color:var(--red);}
+.opt-btn.dim{opacity:0.35;pointer-events:none;}
+.fb-box{border-radius:var(--r-sm);padding:13px;margin-top:12px;display:none;}
+.fb-box.show{display:block;}
+.fb-good{background:var(--teal-pale);border:1px solid rgba(15,140,109,0.18);}
+.fb-bad{background:var(--red-pale);border:1px solid rgba(192,57,43,0.18);}
+.fb-title{font-size:14px;font-weight:700;margin-bottom:3px;}
+.fb-body{font-size:13px;line-height:1.5;}
+
+.theory-wrap{padding:16px;}
+.db-bar{display:flex;align-items:center;gap:8px;background:var(--teal-pale);border-radius:var(--r-sm);padding:9px 13px;margin-bottom:14px;}
+.db-tag{font-size:10px;font-weight:800;background:var(--teal);color:#fff;padding:2px 6px;border-radius:3px;}
+.db-tag-text{font-size:12px;color:var(--teal);}
+.theory-title{font-family:'Playfair Display',serif;font-size:21px;color:var(--ink);margin-bottom:10px;line-height:1.3;}
+.theory-body{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:12px;}
+.theory-hl{border-left:3px solid var(--teal);background:var(--teal-pale);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:11px 13px;font-size:13px;color:var(--teal);line-height:1.6;margin:12px 0;}
+.quiz-result-box{border-radius:var(--r);padding:18px;text-align:center;}
+.quiz-score{font-size:38px;font-weight:800;color:var(--teal);}
+.quiz-score-body{font-size:13px;color:var(--ink2);margin-top:8px;line-height:1.5;}
+
+/* ═══════════════════════════
+   MILESTONES
+═══════════════════════════ */
+.gate-bar{
+  margin:0 16px 4px;
+  background:var(--amber-pale);border:1px solid rgba(232,147,26,0.22);
+  border-radius:var(--r);padding:13px 14px;
+}
+.goal-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 16px 4px;scrollbar-width:none;}
+.goal-scroll::-webkit-scrollbar{display:none;}
+.goal-chip{
+  flex-shrink:0;width:135px;
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:13px;cursor:pointer;
+  transition:border-color 0.12s,background 0.12s;
+}
+.goal-chip:active{opacity:0.8;}
+.goal-chip.selected{border-color:var(--teal);background:var(--teal-pale);}
+.goal-chip-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
+.goal-chip-name{font-size:13px;font-weight:700;color:var(--ink);}
+.goal-chip-desc{font-size:11px;color:var(--ink3);margin-top:2px;line-height:1.35;}
+
+.ms-header{background:var(--teal);margin:16px;border-radius:var(--r);padding:16px 18px;}
+.ms-title{font-family:'Playfair Display',serif;font-size:18px;color:#fff;margin-bottom:3px;}
+.ms-sub{font-size:12px;color:rgba(255,255,255,0.72);margin-bottom:12px;}
+.ms-pbar{height:7px;background:rgba(255,255,255,0.25);border-radius:100px;overflow:hidden;margin-bottom:7px;}
+.ms-pfill{height:7px;border-radius:100px;background:#fff;}
+.ms-plabels{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.72);}
+
+.task-row{
+  display:flex;align-items:flex-start;gap:11px;
+  padding:13px 16px;border-bottom:1px solid var(--border);
+}
+.tcb{
+  width:20px;height:20px;min-width:20px;border-radius:5px;
+  border:1.5px solid var(--border);margin-top:2px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all 0.12s;
+}
+.tcb.checked{background:var(--teal);border-color:var(--teal);}
+.task-txt{font-size:13px;flex:1;line-height:1.4;}
+.task-txt.done{text-decoration:line-through;color:var(--ink3);}
+.task-tag{font-size:11px;white-space:nowrap;align-self:center;}
+
+.calc-lbl{font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:5px;}
+.calc-in{
+  width:100%;height:44px;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  padding:0 13px;font-size:15px;
+  font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);
+}
+.calc-in:focus{outline:none;border-color:var(--teal2);}
+.calc-result{background:var(--teal-pale);border-radius:var(--r-sm);padding:13px;margin-top:12px;}
+.calc-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;}
+.calc-total{display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding-top:8px;margin-top:6px;border-top:1px solid rgba(15,140,109,0.2);color:var(--teal);}
+
+.spend-band{background:var(--card);border-radius:var(--r);border:1px solid var(--border);}
+.spend-top{padding:13px 16px;border-bottom:1px solid var(--border);}
+.spend-big{font-size:30px;font-weight:800;color:var(--teal);line-height:1;}
+.spend-rows{padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+.srow{font-size:13px;}
+.srow-top{display:flex;justify-content:space-between;margin-bottom:4px;}
+.srow-bar{height:5px;background:var(--bg);border-radius:100px;overflow:hidden;}
+.srow-fill{height:5px;border-radius:100px;}
+
+.risk-item{display:flex;gap:9px;align-items:flex-start;padding:11px 12px;border-radius:var(--r-sm);margin-bottom:8px;}
+.risk-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.risk-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+.risk-body{font-size:12px;line-height:1.4;color:var(--ink2);}
+
+.partner-scroll{display:flex;gap:8px;overflow-x:auto;padding:0 16px 4px;scrollbar-width:none;}
+.partner-scroll::-webkit-scrollbar{display:none;}
+.pchip{
+  flex-shrink:0;display:flex;align-items:center;gap:6px;
+  padding:8px 13px;border:1.5px solid var(--border);
+  border-radius:100px;font-size:13px;cursor:pointer;
+  white-space:nowrap;background:var(--card);color:var(--ink2);
+}
+.pchip:active{background:var(--teal-pale);border-color:var(--teal);color:var(--teal);}
+.pdot{width:7px;height:7px;border-radius:50%;}
+
+.ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px;}
+.ach-card{background:var(--card);border-radius:var(--r-sm);border:1px solid var(--border);padding:11px 8px;text-align:center;}
+.ach-icon{width:30px;height:30px;border-radius:50%;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;}
+.ach-name{font-size:11px;font-weight:700;color:var(--ink);line-height:1.3;}
+.ach-locked{opacity:0.38;}
+
+/* ═══════════════════════════
+   CHAT
+═══════════════════════════ */
+.chat-header{
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  background:var(--card);display:flex;align-items:center;gap:10px;
+  flex-shrink:0;
+}
+.chat-msgs{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:14px 16px;display:flex;flex-direction:column;gap:12px;
+}
+.chat-suggests{
+  display:flex;gap:7px;overflow-x:auto;padding:9px 16px;
+  scrollbar-width:none;border-top:1px solid var(--border);
+  background:var(--card);flex-shrink:0;
+}
+.chat-suggests::-webkit-scrollbar{display:none;}
+.sc{
+  flex-shrink:0;padding:7px 12px;border-radius:100px;
+  border:1.5px solid var(--border);font-size:12px;font-weight:500;
+  color:var(--ink2);cursor:pointer;white-space:nowrap;background:var(--card);
+}
+.sc:active{background:var(--teal-pale);border-color:var(--teal);color:var(--teal);}
+.chat-input-bar{
+  display:flex;gap:8px;padding:10px 14px 10px;
+  background:var(--card);border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.ci{
+  flex:1;height:42px;border:1.5px solid var(--border);border-radius:100px;
+  padding:0 15px;font-size:14px;
+  font-family:'Outfit',sans-serif;background:var(--bg);color:var(--ink);
+}
+.ci:focus{outline:none;border-color:var(--teal2);}
+.csend{
+  width:42px;height:42px;border-radius:50%;background:var(--teal);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.csend:active{background:#0a7560;}
+.msg{display:flex;gap:8px;align-items:flex-end;}
+.msg.user{flex-direction:row-reverse;}
+.mav{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.mav.ai{background:var(--teal);color:#fff;}
+.mav.user{background:var(--purple-pale);color:var(--purple);}
+.mbub{max-width:78%;padding:10px 13px;border-radius:16px;font-size:14px;line-height:1.55;}
+.mbub.ai{background:var(--card);color:var(--ink);border-bottom-left-radius:4px;border:1px solid var(--border);}
+.mbub.user{background:var(--teal);color:#fff;border-bottom-right-radius:4px;}
+.msrc{font-size:10px;color:var(--ink3);margin-top:4px;display:flex;align-items:center;gap:4px;padding-left:36px;}
+.src-db{font-size:10px;background:var(--teal-pale);color:var(--teal);padding:1px 5px;border-radius:3px;font-weight:800;}
+.typing-bub{background:var(--card);border:1px solid var(--border);border-radius:16px;border-bottom-left-radius:4px;padding:12px 16px;display:flex;gap:4px;align-items:center;}
+.typing-bub span{width:6px;height:6px;border-radius:50%;background:var(--ink3);animation:bop 1.2s infinite;}
+.typing-bub span:nth-child(2){animation-delay:0.2s;}
+.typing-bub span:nth-child(3){animation-delay:0.4s;}
+@keyframes bop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+/* ═══════════════════════════
+   FEEDBACK
+═══════════════════════════ */
+.star-row{display:flex;gap:10px;margin:8px 0 16px;}
+.star{font-size:32px;cursor:pointer;color:var(--ink3);transition:color 0.1s;line-height:1;}
+.star.lit{color:var(--amber);}
+.fb-ta{
+  width:100%;min-height:96px;
+  border:1.5px solid var(--border);border-radius:var(--r-sm);
+  padding:12px 13px;font-size:14px;font-family:'Outfit',sans-serif;
+  color:var(--ink);background:var(--bg);resize:none;margin-bottom:14px;
+}
+.fb-ta:focus{outline:none;border-color:var(--teal2);}
+.tag-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+.tag-chip{
+  padding:7px 13px;border-radius:100px;border:1.5px solid var(--border);
+  font-size:13px;cursor:pointer;color:var(--ink2);background:var(--card);
+}
+.tag-chip:active{opacity:0.8;}
+.tag-chip.active{background:var(--teal-pale);border-color:var(--teal);color:var(--teal);}
+.fb-success{
+  display:none;background:var(--teal-pale);border:1px solid rgba(15,140,109,0.2);
+  border-radius:var(--r);padding:14px;font-size:14px;color:var(--teal);line-height:1.5;
+  margin-top:12px;
+}
+.fb-success.show{display:block;}
+
+/* Notif drawer */
+.notif-drawer{
+  display:none;
+  position:absolute;top:56px;left:0;right:0;z-index:200;
+  background:var(--card);border-bottom:1px solid var(--border);
+  padding:13px 16px;
+}
+.notif-item{font-size:13px;color:var(--ink2);padding:8px 0;border-bottom:1px solid var(--border);line-height:1.4;}
+.notif-item:last-child{border-bottom:none;}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="logo">Vo<em>k</em>se</div>
+      <div class="logo-sub">supported by Danske Bank</div>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" onclick="toggleNotif()">
+        <svg width="17" height="17" viewBox="0 0 18 18" fill="none"><path d="M9 1.5C6.5 1.5 4.5 3.5 4.5 6V9L3 11h12l-1.5-2V6C13.5 3.5 11.5 1.5 9 1.5z" stroke="var(--ink2)" stroke-width="1.4"/><path d="M6.5 13c0 1.4 1.1 2.5 2.5 2.5s2.5-1.1 2.5-2.5" stroke="var(--ink2)" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <div class="notif-dot" id="ndot"></div>
+      </button>
+      <div class="av">MH</div>
+    </div>
+    <!-- Notif drawer sits inside topbar stacking context -->
+    <div class="notif-drawer" id="notif-drawer">
+      <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;">Notifications</div>
+      <div class="notif-item"><strong style="color:var(--ink);">Quiz passed</strong> — Fixed vs variable rate mortgages · Today</div>
+      <div class="notif-item"><strong style="color:var(--ink);">Milestone alert</strong> — 800 kr behind savings target · Yesterday</div>
+      <div class="notif-item"><strong style="color:var(--ink);">New module</strong> — Daily Finances is now available</div>
+    </div>
+  </div>
+
+  <!-- PAGE AREA -->
+  <div class="page-area" id="page-area">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="panel active" id="panel-dash">
+      <div style="height:14px;"></div>
+      <div class="hero">
+        <div class="hero-g">Good morning</div>
+        <div class="hero-n">Magnus Hansen</div>
+        <div class="hero-grid">
+          <div class="hstat"><div class="hstat-v">74%</div><div class="hstat-l">Overall progress</div></div>
+          <div class="hstat"><div class="hstat-v">4,200 kr</div><div class="hstat-l">Budget left</div></div>
+          <div class="hstat"><div class="hstat-v">11</div><div class="hstat-l">Topics mastered</div></div>
+          <div class="hstat"><div class="hstat-v">38%</div><div class="hstat-l">Home goal</div></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-title">Learning progress</div>
+        <div class="card">
+          <div class="mod-row" onclick="goLearn('housing')">
+            <div class="mod-icon" style="background:var(--teal-pale);"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2.5 10L10 3.5 17.5 10" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round"/><path d="M5 10v7h10v-7" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="mod-info"><div class="mod-name">Housing & Loans</div><div class="pbar" style="margin-top:5px;"><div class="pbar-fill" style="width:90%;"></div></div><div class="mod-meta" style="margin-top:3px;">9/10 topics</div></div>
+            <div class="mod-pct" style="color:var(--teal);">90%</div>
+          </div>
+          <div class="mod-row" onclick="goLearn('invest')">
+            <div class="mod-icon" style="background:var(--amber-pale);"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><polyline points="2,15 7,9 10,11 16,5" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="mod-info"><div class="mod-name">Investments</div><div class="pbar" style="margin-top:5px;"><div class="pbar-fill" style="width:60%;background:var(--amber);"></div></div><div class="mod-meta" style="margin-top:3px;">6/10 topics</div></div>
+            <div class="mod-pct" style="color:var(--amber);">60%</div>
+          </div>
+          <div class="mod-row" onclick="goLearn('pension')">
+            <div class="mod-icon" style="background:var(--purple-pale);"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="var(--purple)" stroke-width="1.5"/><path d="M10 7v3l2 2" stroke="var(--purple)" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="mod-info"><div class="mod-name">Pension & Insurance</div><div class="pbar" style="margin-top:5px;"><div class="pbar-fill" style="width:100%;background:var(--purple);"></div></div><div class="mod-meta" style="margin-top:3px;">Complete ✓</div></div>
+            <div class="mod-pct" style="color:var(--purple);">100%</div>
+          </div>
+          <div class="mod-row" style="border-bottom:none;" onclick="goLearn('daily')">
+            <div class="mod-icon" style="background:var(--coral-pale);"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="5" width="16" height="11" rx="2.5" stroke="var(--coral)" stroke-width="1.5"/><path d="M2 9h16" stroke="var(--coral)" stroke-width="1.5"/></svg></div>
+            <div class="mod-info"><div class="mod-name">Daily Finances</div><div class="pbar" style="margin-top:5px;"><div class="pbar-fill" style="width:30%;background:var(--coral);"></div></div><div class="mod-meta" style="margin-top:3px;">3/10 topics</div></div>
+            <div class="mod-pct" style="color:var(--coral);">30%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec" style="margin-top:18px;">
+        <div class="sec-title">Recent activity</div>
+        <div class="card">
+          <div class="act-item"><div class="act-dot" style="background:var(--teal2);"></div><div><div class="act-text">Passed quiz: Fixed vs variable rate mortgages</div><div class="act-time">Today, 10:14</div></div></div>
+          <div class="act-item"><div class="act-dot" style="background:var(--amber);"></div><div><div class="act-text">Read theory: Compound interest and fund returns</div><div class="act-time">Yesterday</div></div></div>
+          <div class="act-item"><div class="act-dot" style="background:var(--purple);"></div><div><div class="act-text">Milestone task completed: Emergency fund set up</div><div class="act-time">2 days ago</div></div></div>
+        </div>
+      </div>
+      <div style="height:24px;"></div>
+    </div>
+
+    <!-- ══ LEARN ══ -->
+    <div class="panel" id="panel-learn">
+      <div id="lv-modules">
+        <div style="padding:16px 16px 8px;"><div style="font-size:22px;font-weight:800;color:var(--ink);">Learn</div><div style="font-size:14px;color:var(--ink3);margin-top:2px;">Choose a module to begin</div></div>
+        <div class="mod-grid">
+          <div class="mod-card" onclick="openModule('housing')"><div class="mc-top" style="background:var(--teal);"></div><div class="mc-body"><div class="mc-icon" style="background:var(--teal-pale);"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 9L9 3l7 6" stroke="var(--teal)" stroke-width="1.4"/><path d="M4.5 9v6h9V9" stroke="var(--teal)" stroke-width="1.4"/></svg></div><div class="mc-name">Housing & Loans</div><div class="mc-meta">10 topics</div><div class="pbar"><div class="pbar-fill" style="width:90%;"></div></div></div></div>
+          <div class="mod-card" onclick="openModule('invest')"><div class="mc-top" style="background:var(--amber);"></div><div class="mc-body"><div class="mc-icon" style="background:var(--amber-pale);"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="1.5,14 5.5,9 8.5,11 14.5,5" stroke="var(--amber)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mc-name">Investments</div><div class="mc-meta">10 topics</div><div class="pbar"><div class="pbar-fill" style="width:60%;background:var(--amber);"></div></div></div></div>
+          <div class="mod-card" onclick="openModule('pension')"><div class="mc-top" style="background:var(--purple);"></div><div class="mc-body"><div class="mc-icon" style="background:var(--purple-pale);"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6" stroke="var(--purple)" stroke-width="1.4"/><path d="M9 6.5v3l1.5 1.5" stroke="var(--purple)" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="mc-name">Pension & Insurance</div><div class="mc-meta">Complete ✓</div><div class="pbar"><div class="pbar-fill" style="width:100%;background:var(--purple);"></div></div></div></div>
+          <div class="mod-card" onclick="openModule('daily')"><div class="mc-top" style="background:var(--coral);"></div><div class="mc-body"><div class="mc-icon" style="background:var(--coral-pale);"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4.5" width="14" height="9" rx="2" stroke="var(--coral)" stroke-width="1.4"/><path d="M2 8h14" stroke="var(--coral)" stroke-width="1.4"/></svg></div><div class="mc-name">Daily Finances</div><div class="mc-meta">10 topics</div><div class="pbar"><div class="pbar-fill" style="width:30%;background:var(--coral);"></div></div></div></div>
+        </div>
+        <div style="height:20px;"></div>
+      </div>
+
+      <div id="lv-topics" style="display:none;">
+        <div class="back-row" onclick="lv('modules')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="var(--ink3)" stroke-width="1.5" stroke-linecap="round"/></svg><span>Back to modules</span></div>
+        <div style="padding:14px 16px 8px;"><div style="font-size:20px;font-weight:800;color:var(--ink);" id="lt-title">Housing & Loans</div><div style="font-size:13px;color:var(--ink3);margin-top:2px;" id="lt-sub">10 topics</div></div>
+        <div class="card" style="margin:0 16px;" id="lt-list"></div>
+        <div style="height:20px;"></div>
+      </div>
+
+      <div id="lv-assess" style="display:none;">
+        <div class="back-row" onclick="lv('topics')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="var(--ink3)" stroke-width="1.5" stroke-linecap="round"/></svg><span id="ab-crumb">Housing › Topic</span></div>
+        <div style="padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <span class="pill pill-teal" id="apill">Q 1 of 3</span>
+            <div class="pbar" style="width:130px;"><div id="apbar" class="pbar-fill" style="width:33%;"></div></div>
+          </div>
+          <div class="assess-q" id="aq-text"></div>
+          <div class="opt-list" id="aopts"></div>
+          <div class="fb-box" id="afb"><div class="fb-title" id="afb-t"></div><div class="fb-body" id="afb-b"></div></div>
+          <div style="margin-top:14px;display:none;" id="anext"><button class="btn btn-primary" onclick="nextAQ()">Next →</button></div>
+        </div>
+      </div>
+
+      <div id="lv-theory" style="display:none;">
+        <div class="back-row" onclick="lv('topics')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="var(--ink3)" stroke-width="1.5" stroke-linecap="round"/></svg><span>Back to topics</span></div>
+        <div class="theory-wrap" id="theory-content"></div>
+        <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px;">
+          <button class="btn btn-primary" onclick="lv('quiz')">Take the quiz →</button>
+          <button class="btn btn-outline" onclick="nav('chat')">Ask AI assistant</button>
+        </div>
+      </div>
+
+      <div id="lv-quiz" style="display:none;">
+        <div class="back-row" onclick="lv('theory')"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="var(--ink3)" stroke-width="1.5" stroke-linecap="round"/></svg><span>Back to theory</span></div>
+        <div style="padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <span class="pill pill-teal" id="qpill">Q 1 of 4</span>
+            <div class="pbar" style="width:130px;"><div id="qpbar" class="pbar-fill" style="width:25%;"></div></div>
+          </div>
+          <div class="assess-q" id="qq-text"></div>
+          <div class="opt-list" id="qopts"></div>
+          <div class="fb-box" id="qfb"><div class="fb-title" id="qfb-t"></div><div class="fb-body" id="qfb-b"></div></div>
+          <div style="margin-top:14px;display:none;" id="qnext"><button class="btn btn-primary" onclick="nextQQ()">Next →</button></div>
+          <div style="margin-top:14px;display:none;" id="qdone">
+            <div class="quiz-result-box" id="qres-box"><div class="quiz-score" id="qscore"></div><div class="quiz-score-body" id="qscore-body"></div></div>
+            <div style="height:12px;"></div>
+            <button class="btn btn-primary" onclick="lv('topics')">Back to topics →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MILESTONES ══ -->
+    <div class="panel" id="panel-milestones">
+      <div id="ms-sel">
+        <div style="padding:16px 16px 8px;"><div style="font-size:22px;font-weight:800;color:var(--ink);">Milestones</div><div style="font-size:14px;color:var(--ink3);margin-top:2px;">Choose your financial goal</div></div>
+        <div style="padding:0 16px 12px;">
+          <div class="gate-bar">
+            <div style="font-size:14px;font-weight:700;color:var(--amber);margin-bottom:3px;">Free for Danske Bank customers</div>
+            <div style="font-size:13px;color:var(--ink2);line-height:1.5;">Full milestone planning with your Danske Bank account. Non-customers pay 49 kr/month.</div>
+          </div>
+        </div>
+        <div class="sec-title" style="padding:0 16px 8px;">Select a goal</div>
+        <div class="goal-scroll">
+          <div class="goal-chip" id="gc-home" onclick="selGoal('home',this)"><div class="goal-chip-icon" style="background:var(--teal-pale);"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 9L9 3l7 6" stroke="var(--teal)" stroke-width="1.4"/><path d="M4.5 9v6h9V9" stroke="var(--teal)" stroke-width="1.4"/></svg></div><div class="goal-chip-name">Buy a home</div><div class="goal-chip-desc">Deposit, mortgage & timeline</div></div>
+          <div class="goal-chip" id="gc-invest" onclick="selGoal('invest',this)"><div class="goal-chip-icon" style="background:var(--amber-pale);"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="1.5,14 5.5,9 8.5,11 14.5,5" stroke="var(--amber)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="goal-chip-name">Start investing</div><div class="goal-chip-desc">Build your first portfolio</div></div>
+          <div class="goal-chip" id="gc-retire" onclick="selGoal('retire',this)"><div class="goal-chip-icon" style="background:var(--purple-pale);"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6" stroke="var(--purple)" stroke-width="1.4"/><path d="M9 6.5v3l1.5 1.5" stroke="var(--purple)" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="goal-chip-name">Retire comfortably</div><div class="goal-chip-desc">Pension & long-term</div></div>
+          <div class="goal-chip" id="gc-debt" onclick="selGoal('debt',this)"><div class="goal-chip-icon" style="background:var(--coral-pale);"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v14M4 6l5-4 5 4" stroke="var(--coral)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="goal-chip-name">Clear debt</div><div class="goal-chip-desc">Strategic reduction</div></div>
+          <div class="goal-chip" id="gc-emergency" onclick="selGoal('emergency',this)"><div class="goal-chip-icon" style="background:var(--green-pale);"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="4" width="13" height="10" rx="2" stroke="var(--green)" stroke-width="1.4"/><path d="M9 7v4M7 9h4" stroke="var(--green)" stroke-width="1.4" stroke-linecap="round"/></svg></div><div class="goal-chip-name">Emergency fund</div><div class="goal-chip-desc">3–6 months of costs</div></div>
+        </div>
+        <div style="padding:16px;"><button class="btn btn-primary" onclick="startMS()">Generate my plan →</button></div>
+      </div>
+
+      <div id="ms-active" style="display:none;">
+        <div class="back-row" onclick="document.getElementById('ms-sel').style.display='';document.getElementById('ms-active').style.display='none';document.getElementById('page-area').scrollTop=0;"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="var(--ink3)" stroke-width="1.5" stroke-linecap="round"/></svg><span>Change goal</span></div>
+        <div class="ms-header">
+          <div class="ms-title">Buy a home in Copenhagen</div>
+          <div class="ms-sub">Target: 2,500,000 kr · 20% deposit · Est. Apr 2027</div>
+          <div class="ms-pbar"><div class="ms-pfill" style="width:38%;"></div></div>
+          <div class="ms-plabels"><span>38% · 189,000 kr saved</span><span>500,000 kr</span></div>
+        </div>
+
+        <div class="sec"><div class="sec-title">Active tasks</div>
+          <div class="card">
+            <div class="task-row"><div class="tcb checked" id="t1" onclick="tog('t1','tt1')"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5l3 3 6-7" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-txt done" id="tt1">Open a dedicated savings account</div><span class="pill pill-teal" style="font-size:10px;align-self:center;">Done</span></div>
+            <div class="task-row"><div class="tcb checked" id="t2" onclick="tog('t2','tt2')"><svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5l3 3 6-7" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-txt done" id="tt2">Complete Housing & Loans module</div><span class="pill pill-teal" style="font-size:10px;align-self:center;">Done</span></div>
+            <div class="task-row"><div class="tcb" id="t3" onclick="tog('t3','tt3')"></div><div class="task-txt" id="tt3">Set up 8,000 kr monthly auto-transfer</div><span class="task-tag" style="color:var(--amber);">In progress</span></div>
+            <div class="task-row"><div class="tcb" id="t4" onclick="tog('t4','tt4')"></div><div class="task-txt" id="tt4">Book mortgage pre-approval with Ung Direkte</div><span class="task-tag" style="color:var(--ink3);">Up next</span></div>
+            <div class="task-row" style="border-bottom:none;"><div class="tcb" id="t5" onclick="tog('t5','tt5')"></div><div class="task-txt" id="tt5">Review and cut monthly subscriptions</div><span class="task-tag" style="color:var(--ink3);">Suggested</span></div>
+          </div>
+        </div>
+
+        <div class="sec" style="margin-top:18px;"><div class="sec-title">Mortgage calculator</div>
+          <div class="card card-p">
+            <div style="margin-bottom:10px;"><div class="calc-lbl">Property price (kr)</div><input class="calc-in" id="mp" value="2500000" oninput="calcM()"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;">
+              <div><div class="calc-lbl">Deposit (%)</div><input class="calc-in" id="md" value="20" oninput="calcM()"></div>
+              <div><div class="calc-lbl">Rate (%)</div><input class="calc-in" id="mr" value="4.5" oninput="calcM()"></div>
+            </div>
+            <div class="calc-result">
+              <div class="calc-row"><span style="color:var(--ink3);">Loan amount</span><span id="r-loan" style="font-weight:600;">2,000,000 kr</span></div>
+              <div class="calc-row"><span style="color:var(--ink3);">Monthly payment</span><span id="r-mo" style="font-weight:600;">10,130 kr</span></div>
+              <div class="calc-row"><span style="color:var(--ink3);">Total interest</span><span id="r-int" style="font-weight:600;">1,646,936 kr</span></div>
+              <div class="calc-total"><span>Deposit needed</span><span id="r-dep">500,000 kr</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec" style="margin-top:18px;"><div class="sec-title">Spending allowance</div>
+          <div class="spend-band">
+            <div class="spend-top"><div style="font-size:13px;color:var(--ink3);margin-bottom:4px;">You can spend this month</div><div class="spend-big">4,200 kr</div><div style="font-size:12px;color:var(--ink3);margin-top:3px;">After savings and fixed costs</div></div>
+            <div class="spend-rows">
+              <div class="srow"><div class="srow-top"><span style="color:var(--ink2);">Savings target</span><span style="font-weight:700;color:var(--teal);">8,000 kr</span></div><div class="srow-bar"><div class="srow-fill" style="width:19%;background:var(--teal2);"></div></div></div>
+              <div class="srow"><div class="srow-top"><span style="color:var(--ink2);">Fixed costs</span><span style="font-weight:700;">14,200 kr</span></div><div class="srow-bar"><div class="srow-fill" style="width:34%;background:var(--ink3);"></div></div></div>
+              <div class="srow"><div class="srow-top"><span style="color:var(--ink2);">Discretionary</span><span style="font-weight:700;color:var(--amber);">4,200 kr</span></div><div class="srow-bar"><div class="srow-fill" style="width:10%;background:var(--amber);"></div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec" style="margin-top:18px;"><div class="sec-title">Risks</div>
+          <div class="risk-item" style="background:var(--red-pale);"><div class="risk-dot" style="background:var(--red);"></div><div><div class="risk-title" style="color:var(--red);">Rate risk</div><div class="risk-body">Variable rate could rise 1–2% in 2025, adding ~2,000 kr/mo.</div></div></div>
+          <div class="risk-item" style="background:var(--amber-pale);"><div class="risk-dot" style="background:var(--amber);"></div><div><div class="risk-title" style="color:var(--amber);">Savings pace</div><div class="risk-body">At current rate, target reached in 38 months, not 24.</div></div></div>
+          <div class="risk-item" style="background:var(--green-pale);"><div class="risk-dot" style="background:var(--green);"></div><div><div class="risk-title" style="color:var(--green);">Credit score</div><div class="risk-body">Good standing — no issues flagged for approval.</div></div></div>
+        </div>
+
+        <div class="sec" style="margin-top:18px;"><div class="sec-title">Powered by partnerships</div>
+          <div class="card card-p">
+            <div style="font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:14px;">Vokse integrates data intelligence from Danske Bank's key partners to generate more accurate, personalised advice — all behind the scenes, no extra steps needed from you.</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <div style="width:34px;height:34px;border-radius:9px;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C4.4 1.5 1.5 4.4 1.5 8S4.4 14.5 8 14.5 14.5 11.6 14.5 8 11.6 1.5 8 1.5z" stroke="var(--teal)" stroke-width="1.2"/><path d="M8 5v3l2 2" stroke="var(--teal)" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </div>
+                <div><div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px;">Realkredit Danmark</div><div style="font-size:12px;color:var(--ink3);line-height:1.4;">Live mortgage rate data informs your repayment calculations and refinancing alerts.</div></div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <div style="width:34px;height:34px;border-radius:9px;background:var(--purple-pale);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="var(--purple)" stroke-width="1.2"/><path d="M8 5v3l1.5 1.5" stroke="var(--purple)" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </div>
+                <div><div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px;">Danica Pension</div><div style="font-size:12px;color:var(--ink3);line-height:1.4;">Pension projections and coverage gaps are factored into your retirement milestone plan.</div></div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <div style="width:34px;height:34px;border-radius:9px;background:var(--amber-pale);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polyline points="1.5,12 5,7.5 7.5,9.5 13,3.5" stroke="var(--amber)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div><div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px;">Danske Invest</div><div style="font-size:12px;color:var(--ink3);line-height:1.4;">Fund performance and risk profiles power the investment advice in your milestone plan.</div></div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:10px;">
+                <div style="width:34px;height:34px;border-radius:9px;background:var(--coral-pale);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2C5 2 2.5 4.5 2.5 7.5c0 2 1 3.8 2.6 4.8V14h5.8v-1.7c1.6-1 2.6-2.8 2.6-4.8C13.5 4.5 11 2 8 2z" stroke="var(--coral)" stroke-width="1.2"/><path d="M6 14h4" stroke="var(--coral)" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </div>
+                <div><div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px;">Nordnet &amp; Saxo</div><div style="font-size:12px;color:var(--ink3);line-height:1.4;">Broader Nordic market intelligence enriches investment comparisons and risk context.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec" style="margin-top:18px;"><div class="sec-title">Achievements</div>
+          <div class="ach-grid">
+            <div class="ach-card"><div class="ach-icon" style="background:var(--teal-pale);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l1.5 3.5 3.8.5-2.75 2.7.65 3.8L8 10.25l-3.2 1.75.65-3.8L2.7 5.5l3.8-.5z" stroke="var(--teal)" stroke-width="1.1" stroke-linejoin="round"/></svg></div><div class="ach-name">First saver</div></div>
+            <div class="ach-card"><div class="ach-icon" style="background:var(--amber-pale);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polyline points="1.5,12 5,7 7.5,9 13,3" stroke="var(--amber)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="ach-name">Investor</div></div>
+            <div class="ach-card"><div class="ach-icon" style="background:var(--purple-pale);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="var(--purple)" stroke-width="1.2"/><path d="M8 5v3l2 1.5" stroke="var(--purple)" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="ach-name">Streak keeper</div></div>
+            <div class="ach-card ach-locked"><div class="ach-icon" style="background:var(--bg);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="var(--ink3)" stroke-width="1.2"/><path d="M5 7V5.5a3 3 0 016 0V7" stroke="var(--ink3)" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="ach-name">Locked</div></div>
+            <div class="ach-card ach-locked"><div class="ach-icon" style="background:var(--bg);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="var(--ink3)" stroke-width="1.2"/><path d="M5 7V5.5a3 3 0 016 0V7" stroke="var(--ink3)" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="ach-name">Locked</div></div>
+            <div class="ach-card ach-locked"><div class="ach-icon" style="background:var(--bg);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="var(--ink3)" stroke-width="1.2"/><path d="M5 7V5.5a3 3 0 016 0V7" stroke="var(--ink3)" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="ach-name">Locked</div></div>
+          </div>
+        </div>
+        <div style="height:24px;"></div>
+      </div>
+    </div>
+
+    <!-- ══ CHAT ══ -->
+    <div class="panel" id="panel-chat">
+      <div class="chat-header">
+        <div style="width:34px;height:34px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="white" stroke-width="1.3"/><path d="M2 14c0-3 2.7-5 6-5s6 2 6 5" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+        <div style="flex:1;"><div style="font-size:14px;font-weight:700;color:var(--ink);">Vokse AI</div><div style="font-size:11px;color:var(--ink3);">Grounded in Danske Bank resources</div></div>
+        <span class="pill pill-teal" style="font-size:10px;">Online</span>
+      </div>
+      <div class="chat-suggests">
+        <div class="sc" onclick="ask('What is the difference between a fixed and variable rate mortgage?')">Fixed vs variable?</div>
+        <div class="sc" onclick="ask('How much pension should I contribute?')">Pension amount?</div>
+        <div class="sc" onclick="ask('What tax deductions am I missing?')">Tax deductions?</div>
+        <div class="sc" onclick="ask('How does Danske Invest Global AC perform?')">Danske Invest?</div>
+        <div class="sc" onclick="ask('What is befordringsfradrag?')">Befordringsfradrag?</div>
+      </div>
+      <div class="chat-msgs" id="cmsgs">
+        <div class="msg"><div class="mav ai">V</div><div><div class="mbub ai">Hi Magnus. Ask me anything about housing, investments, pension or daily finances. I'll answer based on Danske Bank's educational resources.</div><div class="msrc"><span class="src-db">DB</span><span>Danske Bank resources</span></div></div></div>
+      </div>
+      <div class="chat-input-bar">
+        <input class="ci" id="ci" placeholder="Ask about tax, mortgages, investing..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="csend" onclick="sendChat()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M14 8L2 2l3 6-3 6z" fill="white"/></svg></button>
+      </div>
+    </div>
+
+    <!-- ══ FEEDBACK ══ -->
+    <div class="panel" id="panel-feedback">
+      <div style="padding:16px 16px 8px;"><div style="font-size:22px;font-weight:800;color:var(--ink);">Feedback</div><div style="font-size:14px;color:var(--ink3);margin-top:2px;">Help us improve Vokse</div></div>
+      <div style="padding:0 16px 24px;">
+        <div class="card card-p">
+          <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:2px;">Overall rating</div>
+          <div style="font-size:13px;color:var(--ink3);">How satisfied are you with Vokse?</div>
+          <div class="star-row" id="star-row"><div class="star" onclick="rateStar(1)">★</div><div class="star" onclick="rateStar(2)">★</div><div class="star" onclick="rateStar(3)">★</div><div class="star" onclick="rateStar(4)">★</div><div class="star" onclick="rateStar(5)">★</div></div>
+          <div class="div" style="margin-bottom:14px;"></div>
+          <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;">What worked best?</div>
+          <div class="tag-row" id="tag-row">
+            <div class="tag-chip" onclick="this.classList.toggle('active')">Learn modules</div>
+            <div class="tag-chip" onclick="this.classList.toggle('active')">AI assistant</div>
+            <div class="tag-chip" onclick="this.classList.toggle('active')">Milestone plan</div>
+            <div class="tag-chip" onclick="this.classList.toggle('active')">Calculators</div>
+            <div class="tag-chip" onclick="this.classList.toggle('active')">Risk overview</div>
+            <div class="tag-chip" onclick="this.classList.toggle('active')">DB resources</div>
+          </div>
+          <div class="div" style="margin-bottom:14px;"></div>
+          <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:8px;">Tell us more</div>
+          <textarea class="fb-ta" id="fb-ta" placeholder="What would you improve? Any features you'd like to see?"></textarea>
+          <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;">Would you recommend Vokse?</div>
+          <div style="display:flex;gap:8px;margin-bottom:18px;">
+            <div class="tag-chip" id="ry" onclick="setRec('y')">Yes</div>
+            <div class="tag-chip" id="rm" onclick="setRec('m')">Maybe</div>
+            <div class="tag-chip" id="rn" onclick="setRec('n')">Not yet</div>
+          </div>
+          <button class="btn btn-primary" onclick="submitFB()">Submit feedback</button>
+        </div>
+        <div class="fb-success" id="fbsuccess">Thank you, Magnus. Your feedback has been sent to the Vokse team at Danske Bank.</div>
+      </div>
+    </div>
+
+  </div><!-- end page-area -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="bnav">
+    <button class="ntab active" id="nt-dash" onclick="nav('dash')">
+      <div class="nind"></div>
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="8" height="8" rx="2" fill="currentColor" opacity="0.9" stroke="none" class="ntab-fill"/><rect x="12" y="2" width="8" height="8" rx="2" fill="currentColor" opacity="0.3" stroke="none" class="ntab-fill"/><rect x="2" y="12" width="8" height="8" rx="2" fill="currentColor" opacity="0.3" stroke="none" class="ntab-fill"/><rect x="12" y="12" width="8" height="8" rx="2" fill="currentColor" opacity="0.3" stroke="none" class="ntab-fill"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="ntab" id="nt-learn" onclick="nav('learn')">
+      <div class="nind"></div>
+      <svg viewBox="0 0 22 22" fill="none"><path d="M4 6h14M4 11h10M4 16h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      <span>Learn</span>
+    </button>
+    <button class="ntab" id="nt-milestones" onclick="nav('milestones')">
+      <div class="nind"></div>
+      <svg viewBox="0 0 22 22" fill="none"><path d="M11 2.5l2.5 6.5H20l-5.2 3.8 2 6.2L11 15 5.2 19l2-6.2L2 9h6.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <span>Goals</span>
+    </button>
+    <button class="ntab" id="nt-chat" onclick="nav('chat')">
+      <div class="nind"></div>
+      <svg viewBox="0 0 22 22" fill="none"><path d="M3 3h16a1 1 0 011 1v10a1 1 0 01-1 1H6l-4 4V4a1 1 0 011-1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <span>AI Chat</span>
+    </button>
+    <button class="ntab" id="nt-feedback" onclick="nav('feedback')">
+      <div class="nind"></div>
+      <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M11 7v5M11 14.5v.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>Feedback</span>
+    </button>
+  </nav>
+
+</div><!-- end app-shell -->
+
+<script>
+// ── NAVIGATION ──
+function nav(page) {
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.remove('active');
+    if(p.id === 'panel-chat') p.style.display = 'none';
+  });
+  document.querySelectorAll('.ntab').forEach(t => t.classList.remove('active'));
+  var panel = document.getElementById('panel-' + page);
+  if(panel) {
+    if(page === 'chat') {
+      panel.style.display = 'flex';
+      panel.classList.add('active');
+    } else {
+      panel.classList.add('active');
+    }
+  }
+  var tab = document.getElementById('nt-' + page);
+  if(tab) tab.classList.add('active');
+  document.getElementById('page-area').scrollTop = 0;
+}
+
+function goLearn(mod) { nav('learn'); openModule(mod); }
+
+// ── NOTIFICATIONS ──
+var nOpen = false;
+function toggleNotif() {
+  nOpen = !nOpen;
+  document.getElementById('notif-drawer').style.display = nOpen ? 'block' : 'none';
+  document.getElementById('ndot').style.display = nOpen ? 'none' : 'block';
+}
+
+// ── LEARN ──
+var modData = {
+  housing:{ title:'Housing & Loans', sub:'10 topics · 9 completed', done:9 },
+  invest:{ title:'Investments', sub:'10 topics · 6 completed', done:6 },
+  pension:{ title:'Pension & Insurance', sub:'10 topics · Complete ✓', done:10 },
+  daily:{ title:'Daily Finances', sub:'10 topics · 3 completed', done:3 }
+};
+var curMod = null, curTopic = null, aIdx = 0, qIdx = 0, qScore = 0;
+
+var topicNames = ['Overview','Fixed vs variable rates','How much can you borrow?','The deposit requirement','Boliglån explained','Cost of ownership','First-time buyer schemes','Repayment types','Refinancing','Market conditions'];
+
+function openModule(m) {
+  curMod = m;
+  var d = modData[m];
+  document.getElementById('lt-title').textContent = d.title;
+  document.getElementById('lt-sub').textContent = d.sub;
+  var list = document.getElementById('lt-list');
+  list.innerHTML = '';
+  topicNames.forEach(function(t, i) {
+    var isDone = i < d.done;
+    var row = document.createElement('div');
+    row.className = 'topic-row';
+    row.style.borderBottom = i < 9 ? '1px solid var(--border)' : 'none';
+    row.innerHTML = '<div class="tnum '+(isDone?'done':'')+'">'+( isDone?'✓':(i+1) )+'</div><div style="font-size:14px;font-weight:500;flex:1;">'+t+'</div><span style="font-size:12px;color:var(--ink3);">'+(isDone?'Done':'→')+'</span>';
+    row.onclick = function(){ openTopic(t, i); };
+    list.appendChild(row);
+  });
+  lv('topics');
+}
+
+function openTopic(name, idx) {
+  curTopic = { name, idx };
+  document.getElementById('ab-crumb').textContent = (modData[curMod]||{}).title + ' › ' + name;
+  aIdx = 0; showAQ();
+  lv('assess');
+}
+
+function lv(v) {
+  ['modules','topics','assess','theory','quiz'].forEach(function(x) {
+    var el = document.getElementById('lv-'+x);
+    if(el) el.style.display = v===x ? '' : 'none';
+  });
+  if(v==='quiz') startQuiz();
+  document.getElementById('page-area').scrollTop = 0;
+}
+
+// ── ASSESSMENT ──
+var aQs = [
+  { q:"What's your current level on this topic?", opts:["Complete beginner","I know the basics","Fairly confident","Very confident"], fb:"We'll tailor the theory to match your level." },
+  { q:"Have you ever applied this in real life?", opts:["No, never","Researched but not applied","Yes, once","Yes, multiple times"], fb:"Noted — the theory will be relevant to your situation." },
+  { q:"What's your main goal for this topic?", opts:["Understand the concepts","Make a specific decision","Help someone else understand","Just pass the quiz"], fb:"Let's get started with the theory." }
+];
+
+function showAQ() {
+  var q = aQs[aIdx];
+  document.getElementById('apill').textContent = 'Q '+(aIdx+1)+' of '+aQs.length;
+  document.getElementById('apbar').style.width = Math.round(((aIdx+1)/aQs.length)*100)+'%';
+  document.getElementById('aq-text').textContent = q.q;
+  var opts = document.getElementById('aopts');
+  opts.innerHTML = '';
+  q.opts.forEach(function(o) {
+    var btn = document.createElement('button');
+    btn.className = 'opt-btn'; btn.textContent = o;
+    btn.onclick = function() {
+      opts.querySelectorAll('.opt-btn').forEach(b=>b.classList.add('dim'));
+      btn.classList.remove('dim');
+      btn.style.borderColor='var(--teal2)';btn.style.background='var(--teal-pale)';btn.style.color='var(--teal)';
+      var fb = document.getElementById('afb');
+      document.getElementById('afb-t').textContent='Got it!';
+      document.getElementById('afb-b').textContent=q.fb;
+      fb.className='fb-box fb-good show';
+      document.getElementById('anext').style.display='block';
+    };
+    opts.appendChild(btn);
+  });
+  document.getElementById('afb').className='fb-box';
+  document.getElementById('anext').style.display='none';
+}
+
+function nextAQ() {
+  aIdx++;
+  if(aIdx >= aQs.length) { showTheory(); return; }
+  showAQ();
+}
+
+function showTheory() {
+  var name = curTopic ? curTopic.name : 'This topic';
+  document.getElementById('theory-content').innerHTML =
+    '<div class="db-bar"><span class="db-tag">DB</span><span class="db-tag-text">Sourced from Danske Bank\'s official educational resources</span></div>'
+    +'<div class="theory-title">'+name+'</div>'
+    +'<div class="theory-body">This topic is fundamental to building your financial confidence. Based on your assessment, here\'s what you need to understand most clearly.</div>'
+    +'<div class="theory-hl">Danske Bank\'s approach emphasises understanding the fundamentals before any financial decision. Knowledge builds confidence — and confidence leads to better outcomes.</div>'
+    +'<div class="theory-body">Read through carefully. The AI assistant can answer any questions you have — just tap "Ask AI assistant" below. When you\'re ready, take the quiz to complete this topic and unlock the next one.</div>';
+  lv('theory');
+}
+
+// ── QUIZ ──
+var qQs = [
+  { q:"Which best describes this topic's core importance?", opts:["Only for advanced users","Affects everyday financial decisions","Only relevant after age 40","Mainly for businesses"], c:1, r:"Correct — this topic directly shapes everyday financial choices.", w:"This topic affects decisions at every life stage, making it important to understand early." },
+  { q:"What does Danske Bank recommend as a first step?", opts:["Act immediately","Build understanding before deciding","Wait for rates to improve","Let someone else decide"], c:1, r:"Exactly — DB consistently prioritises education before action.", w:"Danske Bank's guidance always emphasises building understanding before making financial moves." },
+  { q:"What's the key risk of not understanding this area?", opts:["Missing small gains","Making uninformed long-term decisions","Paying slightly higher fees","Nothing serious"], c:1, r:"Right — uninformed decisions in this area can compound into major consequences over time.", w:"Decisions here can play out over decades. The earlier you understand them, the better." },
+  { q:"How does this connect to your milestone plan?", opts:["It doesn't","Directly informs your tasks and decisions","Optional background reading","Only if earning over 500K"], c:1, r:"Spot on — every module in Vokse directly supports your ability to execute your goals.", w:"Each topic was chosen because it has a direct bearing on your financial milestone planning." }
+];
+
+function startQuiz() {
+  qIdx=0;qScore=0;
+  document.getElementById('qdone').style.display='none';
+  document.getElementById('qnext').style.display='none';
+  showQQ();
+}
+
+function showQQ() {
+  var q = qQs[qIdx];
+  document.getElementById('qpill').textContent='Q '+(qIdx+1)+' of '+qQs.length;
+  document.getElementById('qpbar').style.width=Math.round(((qIdx+1)/qQs.length)*100)+'%';
+  document.getElementById('qq-text').textContent=q.q;
+  var opts=document.getElementById('qopts');
+  opts.innerHTML='';
+  q.opts.forEach(function(o,i){
+    var btn=document.createElement('button');
+    btn.className='opt-btn';btn.textContent=o;
+    btn.onclick=function(){
+      var isRight=i===q.c;
+      if(isRight) qScore++;
+      opts.querySelectorAll('.opt-btn').forEach(function(b,j){
+        b.classList.add('dim');
+        if(j===q.c) b.classList.add('correct');
+      });
+      btn.classList.remove('dim');
+      if(!isRight) btn.classList.add('wrong');
+      var fb=document.getElementById('qfb');
+      document.getElementById('qfb-t').textContent=isRight?'Correct!':'Not quite';
+      document.getElementById('qfb-b').textContent=isRight?q.r:q.w;
+      fb.className='fb-box '+(isRight?'fb-good':'fb-bad')+' show';
+      if(qIdx<qQs.length-1) document.getElementById('qnext').style.display='block';
+      else setTimeout(showQResult,400);
+    };
+    opts.appendChild(btn);
+  });
+  document.getElementById('qfb').className='fb-box';
+  document.getElementById('qnext').style.display='none';
+  document.getElementById('qdone').style.display='none';
+}
+
+function nextQQ(){ qIdx++;showQQ(); }
+
+function showQResult() {
+  document.getElementById('qnext').style.display='none';
+  document.getElementById('qdone').style.display='block';
+  var pct=Math.round(qScore/qQs.length*100);
+  var box=document.getElementById('qres-box');
+  box.style.background=pct>=75?'var(--teal-pale)':'var(--red-pale)';
+  box.style.border=pct>=75?'1px solid rgba(15,140,109,0.18)':'1px solid rgba(192,57,43,0.18)';
+  document.getElementById('qscore').style.color=pct>=75?'var(--teal)':'var(--red)';
+  document.getElementById('qscore').textContent=qScore+'/'+qQs.length;
+  document.getElementById('qscore-body').textContent=pct>=75?'Topic complete! Next topic is now unlocked.':'Review the theory and try again — the AI can help with anything unclear.';
+}
+
+// ── MILESTONES ──
+var chosenGoal = null;
+function selGoal(id,el) {
+  document.querySelectorAll('.goal-chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  chosenGoal = id;
+}
+function startMS() {
+  if(!chosenGoal){alert('Please select a goal first.');return;}
+  document.getElementById('ms-sel').style.display='none';
+  document.getElementById('ms-active').style.display='block';
+  document.getElementById('page-area').scrollTop=0;
+}
+function tog(cbId,txtId) {
+  var cb=document.getElementById(cbId), txt=document.getElementById(txtId);
+  var on=cb.classList.toggle('checked');
+  cb.innerHTML=on?'<svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4.5l3 3 6-7" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>':'';
+  txt.classList.toggle('done',on);
+}
+function calcM(){
+  var p=parseFloat(document.getElementById('mp').value)||0;
+  var d=parseFloat(document.getElementById('md').value)||20;
+  var r=parseFloat(document.getElementById('mr').value)||4.5;
+  var dep=p*d/100,loan=p-dep,mr2=r/100/12,n=360;
+  var mo=mr2===0?loan/n:loan*mr2*Math.pow(1+mr2,n)/(Math.pow(1+mr2,n)-1);
+  var fmt=v=>Math.round(v).toLocaleString('da-DK')+' kr';
+  document.getElementById('r-loan').textContent=fmt(loan);
+  document.getElementById('r-mo').textContent=fmt(mo);
+  document.getElementById('r-int').textContent=fmt(mo*n-loan);
+  document.getElementById('r-dep').textContent=fmt(dep);
+}
+
+// ── CHAT ──
+var cReplies = {
+  'What is the difference between a fixed and variable rate mortgage?':'A fixed rate locks your interest for 1–10 years — your payment stays predictable. A variable rate changes with the market, usually lower to start but riskier. Most Danish buyers split: ~60% fixed for certainty, ~40% variable for potential savings.\n\nDanske Bank recommends reviewing your rate structure every 2–3 years.',
+  'How much pension should I contribute?':'The Danish rule of thumb is 12–15% of gross salary including employer contributions. If your employer pays 8–10%, a personal top-up of 3–5% usually keeps you on track. Starting early matters most — compound growth handles the heavy lifting.',
+  'What tax deductions am I missing?':'Common ones workers miss: (1) Befordringsfradrag — commuting over 24km each way; (2) A-kasse fees; (3) Fagforening dues; (4) Charitable donations to approved organisations. Check skat.dk every March for your årsopgørelse — it\'s often pre-filled incorrectly.',
+  'How does Danske Invest Global AC perform?':'Danske Invest Global AC holds 200+ global stocks. 5-year average return ~9.4%/year at risk level 5/7. Popular with younger investors with a 10+ year horizon. Risk level 5 means you could see ±20-30% swings in a single year — but it smooths out over a decade.',
+  'What is befordringsfradrag?':'A commuting deduction — if you travel more than 24km each way to work, you can deduct 2.23 kr/km above that threshold (up to 120km), and 1.12 kr/km beyond. Claim it in your årsopgørelse on skat.dk. No receipts needed, just your employer\'s address.'
+};
+
+function ask(text){ document.getElementById('ci').value=text; sendChat(); }
+
+function sendChat(){
+  var ci=document.getElementById('ci');
+  var text=ci.value.trim();
+  if(!text) return;
+  ci.value='';
+  var msgs=document.getElementById('cmsgs');
+  var uRow=document.createElement('div');
+  uRow.className='msg user';
+  uRow.innerHTML='<div class="mav user">MH</div><div class="mbub user">'+text+'</div>';
+  msgs.appendChild(uRow);
+  var typing=document.createElement('div');
+  typing.className='msg';
+  typing.innerHTML='<div class="mav ai">V</div><div class="typing-bub"><span></span><span></span><span></span></div>';
+  msgs.appendChild(typing);
+  msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(function(){
+    msgs.removeChild(typing);
+    var reply=cReplies[text]||'Good question. Could you share more context — your income level, current savings and timeline? That will help me give you a precise answer based on Danske Bank\'s guidance.';
+    var hasSrc=!!cReplies[text];
+    var aRow=document.createElement('div');
+    aRow.className='msg';
+    var src=hasSrc?'<div class="msrc"><span class="src-db">DB</span><span>Sourced from Danske Bank resources</span></div>':'';
+    aRow.innerHTML='<div class="mav ai">V</div><div><div class="mbub ai">'+reply.replace(/\n/g,'<br>')+'</div>'+src+'</div>';
+    msgs.appendChild(aRow);
+    msgs.scrollTop=msgs.scrollHeight;
+  },1100);
+}
+
+// ── FEEDBACK ──
+function rateStar(n){document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('lit',i<n));}
+function setRec(v){['y','m','n'].forEach(x=>document.getElementById('r'+x).classList.toggle('active',x===v));}
+function submitFB(){
+  var s=document.getElementById('fbsuccess');
+  s.classList.add('show');
+  setTimeout(()=>s.classList.remove('show'),4000);
+}
+
+// ── INIT ──
+calcM();
+</script>
+</body>
+</html>
